@@ -1,0 +1,10 @@
+# Trainer config for Binoculars RL training
+# Updates model weights using PPO
+
+max_steps = 100
+
+[model]
+name = "Qwen/Qwen3-0.6B"
+
+[optimization]
+lr = 1e-6

@@ -1,0 +1,5 @@
+# Inference server config for Binoculars RL training
+# Runs vLLM server to generate completions
+
+[model]
+name = "Qwen/Qwen3-0.6B"

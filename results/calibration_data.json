@@ -1,0 +1,33 @@
+{
+  "accuracy_threshold": 1.5102040767669678,
+  "accuracy_metrics": {
+    "precision": 0.749498997995992,
+    "recall": 0.9973333333333333,
+    "f1": 0.8558352402745996,
+    "accuracy": 0.748,
+    "fpr": 1.0
+  },
+  "low_fpr_threshold": 0.9100719690322876,
+  "low_fpr_metrics": {
+    "precision": 1.0,
+    "recall": 0.08266666666666667,
+    "f1": 0.15270935960591134,
+    "accuracy": 0.312,
+    "fpr": 0.0
+  },
+  "score_stats": {
+    "ai_mean": 1.0555495268503825,
+    "ai_std": 0.10149004324677488,
+    "human_mean": 1.02030628156662,
+    "human_std": 0.03902325568208848
+  },
+  "model": {
+    "observer": "Qwen/Qwen2.5-0.5B",
+    "performer": "Qwen/Qwen2.5-0.5B-Instruct"
+  },
+  "samples": {
+    "total": 500,
+    "ai": 375,
+    "human": 125
+  }
+}

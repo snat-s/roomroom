@@ -1,0 +1,20 @@
+# Orchestrator config for Binoculars RL training
+# Generates rollouts and computes rewards using the Binoculars environment
+
+batch_size = 64
+rollouts_per_example = 8
+seq_len = 512
+max_steps = 100
+
+[model]
+name = "Qwen/Qwen3-0.6B"
+
+[sampling]
+max_tokens = 128
+temperature = 0.7
+
+[[env]]
+id = "binoculars-env"
+
+[env.args]
+max_samples = 5000
