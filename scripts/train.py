@@ -46,9 +46,10 @@ def main():
     model = AutoModelForCausalLM.from_pretrained(
         args.model,
         torch_dtype=torch.bfloat16,
-        device_map="auto",
-    )
+    ).to(device)
     model.train()
+    for param in model.parameters():
+        param.requires_grad = True
 
     # Load Binoculars detector
     print("\nLoading Binoculars detector...")
@@ -79,7 +80,7 @@ def main():
         batch_texts = [ds[i]["text"][:150] for i in indices]
 
         batch_rewards = []
-        batch_loss = 0.0
+        batch_loss = torch.tensor(0.0, device=device, requires_grad=True)
 
         for text in batch_texts:
             # Create prompt
@@ -111,18 +112,21 @@ def main():
             batch_rewards.append(reward)
 
             # Compute log probs for REINFORCE
-            with torch.enable_grad():
-                full_ids = outputs.sequences
-                logits = model(full_ids).logits
+            # Clone tensors and do fresh forward pass with gradients enabled
+            torch.set_grad_enabled(True)
+            full_ids = outputs.sequences.clone().detach()
+            gen_ids = generated_ids.clone().detach()
 
-                # Get log probs of generated tokens
-                gen_logits = logits[0, inputs.input_ids.shape[1]-1:-1, :]
-                gen_probs = F.log_softmax(gen_logits, dim=-1)
-                token_log_probs = gen_probs.gather(1, generated_ids.unsqueeze(1)).squeeze(1)
+            logits = model(input_ids=full_ids).logits
 
-                # REINFORCE loss: -reward * log_prob
-                loss = -reward * token_log_probs.mean()
-                batch_loss += loss
+            # Get log probs of generated tokens
+            gen_logits = logits[0, inputs.input_ids.shape[1]-1:-1, :]
+            gen_probs = F.log_softmax(gen_logits, dim=-1)
+            token_log_probs = gen_probs.gather(1, gen_ids.unsqueeze(1)).squeeze(1)
+
+            # REINFORCE loss: -reward * log_prob
+            loss = -reward * token_log_probs.mean()
+            batch_loss = batch_loss + loss
 
         # Update
         optimizer.zero_grad()
